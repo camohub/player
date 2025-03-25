@@ -145,6 +145,7 @@
     <iframe id="iframe-2" class="inactive"></iframe>
 </div>
 
+<script src="http://localhost/player/logger.js"></script>
 <script src="http://localhost/player/player.js"></script>
 
 </body>
