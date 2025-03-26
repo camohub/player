@@ -9,15 +9,16 @@ logger = {
     
     /////// METHODS ////////////////////////////////////////////////////
     
-    logImpressions: function(medium) {
+    logImpressions: async function(medium) {
         
         medium.timestamp = Math.round(Date.now() / 1000);  // now() returns milliseconds but we need seconds and integer
         logger.impressions.push(medium);
             
         try {
-            axios.post('http://localhost/player/impressions.php', { impressions: logger.impressions, });
+            await axios.post('http://localhost/player/impressions.php', { impressions: logger.impressions, });
         
             logger.__clearImpressions();
+            console.log('impressions deleted');
         }
         catch (e) {
             logger.logError(e);
@@ -29,7 +30,7 @@ logger = {
      * @param e
      * @param i  // Increment to prevent infinite loop
      */
-    logError: function(e, i = 0) {
+    logError: async function(e, i = 0) {
         
         if ( logger.errors.length > 200 ) return;  // Prevent memory leak
         
@@ -38,12 +39,14 @@ logger = {
         logger.errors.push({
             "message": e.toString(),
             'stack': (e.stack ? e.stack : null),
+            'timestamp': Math.round(Date.now() / 1000),  // now() returns milliseconds but we need seconds and integer
         });
         
         try {
-            axios.post('http://localhost/player/error.php', { errors: logger.errors });
+            await axios.post('http://localhost/player/error.php', { errors: logger.errors });
             
             logger.__clearErrors();
+            console.log('errors deleted');
         }
         catch (catch_error) {
             // This set up delay to prevent too many server requests

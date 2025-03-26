@@ -45,7 +45,7 @@ player = {
         player.html_videos.forEach(video => {
             video.addEventListener('ended', function (e) {
                 console.log('.................. VIDEO ENDED');
-                logger.logImpressions(player.current_medium);
+                logger.logImpressions(player.current_medium);  // This is asynchronous call. It is not blocking the flow although inside the logImpressions() is await
                 console.log(player.current_medium);
                 player.playNext();  // Can not use this cause it is anonymous function
             });
@@ -118,7 +118,7 @@ player = {
                     console.log('.................. IMAGE ENDED');
                     logger.logImpressions(player.current_medium);
                     player.playNext();  // Can not use this cause it is anonymous function
-                }, player.next_medium.duration * 1000 - 50);  // -50 is little reserve
+                }, player.next_medium.duration * 1000 - 20);  // -20 is little reserve
             }
             else if ( player.next_medium.type === 'template' ) {
                 
@@ -126,7 +126,7 @@ player = {
                     console.log('.................. IFRAME ENDED');
                     logger.logImpressions(player.current_medium);
                     player.playNext();  // Can not use this cause it is anonymous function
-                }, player.next_medium.duration * 1000 - 50);  // -50 is little reserve
+                }, player.next_medium.duration * 1000 - 20);  // -20 is little reserve
             }
             
             // CSS SHOW/HIDE
