@@ -17,7 +17,7 @@ logger = {
         try {
             axios.post('http://localhost/player/impressions.php', { impressions: logger.impressions, });
         
-            logger.__clearImpressionsxxx();
+            logger.__clearImpressions();
         }
         catch (e) {
             logger.logError(e);
