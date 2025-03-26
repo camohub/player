@@ -18,7 +18,7 @@ logger = {
         if ( logger.impressions.length >= 3 ) {
             
             try {
-                const response = axios.post('http://localhost/player/impressions.php', { impressions: logger.impressions, });
+                axios.post('http://localhost/player/impressions.php', { impressions: logger.impressions, });
             
                 logger.clearImpressions();
             }
@@ -31,37 +31,41 @@ logger = {
     /**
      * LOG ERROR TO LOCAL SERVER
      * @param e
-     * @param i
+     * @param i  // Increment to prevent infinite loop
      */
     logError: function(e, i = 0) {
         
-        console.error(e);
-        logger.errors.push(e);
+        if ( logger.errors.length > 100 ) return;  // Prevent memory overflow
+        
+        if (!(e instanceof Error)) e = new Error(e);  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch
+        
+        logger.errors.push({
+            "message": e.toString(),
+            'stack': (e.stack ? e.stack : null),
+        });
         
         try {
-            const response = axios.post('http://localhost/player/error.php', { error: logger.errors, });
+            console.log(logger.errors);
+            axios.post('http://localhost/player/error.php', { errors: logger.errors });
             
             logger.clearErrors();
         }
-        catch (e) {
-            // This set up delay and max increment to prevent infinite loop
+        catch (catch_error) {
+            // This set up delay to prevent too many server requests
+            // and max increment to prevent infinite loop
             setTimeout(function () {
-                if (i < 30) {
-                    logger.logError(e, ++i);  // e is not the same as catch_error
-                }
-            }, 2000);
+                if ( i < 10 ) logger.logError(e, ++i);  // e is original error not the catch_error.
+            }, 10000);
         }
     },
     
     /**
-     * LOG IF SCRIP IS STILL RUNNING WITHOUT ERRORS TO LOCAL SERVER
+     * LOG IF SCRIP IS STILL RUNNING WITHOUT BLOCKING JAVASCRIPT ERRORS
+     * There can be errors caught in try..catch but not blocking the javascript
      */
     logOk: function() {
         
-        console.log('LOG OK');
-        console.log(this);
-        
-        if ( !logger.errors.length ) return;
+        if ( logger.errors.length ) return;
         
         try {
             const response = axios.get('http://localhost/player/ok.php');
@@ -70,7 +74,6 @@ logger = {
             logger.logError(e);
         }
     },
-    
     
     clearErrors: function() {
         logger.errors = [];

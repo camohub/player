@@ -27,28 +27,24 @@ player = {
             video.addEventListener('ended', function (e) {
                 console.log('.................. ENDED');
                 logger.logImpressions(player.current_medium);
-                console.log(e.target.src);
-                console.log(this);
+                console.log(player.current_medium);
                 player.playNext();  // Can not use this cause it is anonymous function
             });
             
-            video.addEventListener('error', function () {
+            video.addEventListener('error', function (e) {
                 console.log('|||||||||||||||||||| ERROR loading video');
-                console.log(e.target.src);
                 player.playNext();  // Can not use this cause it is anonymous function
+                logger.logError(e);
             });
         });
         
         // LOAD PLAYLIST
         await player.loadPlaylist();
         
-        console.log('555555555555555555555555555555555');
-        console.log(player.playlist);
-        
-        // FIRST RUN
+        // INIT FIRST MEDIUM
         player.initNext();  // First run initialization
         
-        // PLAY
+        // FIRST RUN
         player.playNext();  // First run
     },
     
@@ -58,7 +54,6 @@ player = {
      */
     initNext: function() {
         try {
-            console.log('Playlist:', player.playlist);
             player.next_medium = player.playlist[player.playlist_index];
             console.log('Next medium:', player.next_medium);
             
@@ -141,17 +136,15 @@ player = {
      * @param i
      * @returns {[{duration: number, src: string, type: string},{duration: number, src: string, type: string},{duration: number, src: string, type: string},{duration: number, src: string, type: string},{duration: number, src: string, type: string},null,null,null]}
      */
-    loadPlaylist: async function(i = 0) {
+    loadPlaylist: async function() {
         try {
             const response = await axios.get('http://localhost/player/playlist.php');
             
-            console.log(response.data);
             player.playlist = response.data;
-            console.log(player.playlist);
         }
         catch( e ) {
-            console.log(e);
-            logger.logError(e, ++i)
+            console.error(e);
+            logger.logError(e)
         }
     },
 }
