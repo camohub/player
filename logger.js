@@ -1,6 +1,5 @@
 /**
  * LOGGER MODULE
- * @type {{logImpressions: logger.logImpressions, logError: logger.logError, logOk: logger.logOk, clearErrors: logger.clearErrors, impressions: *[], clearImpressions: logger.clearImpressions, errors: *[]}}
  */
 logger = {
     
@@ -12,19 +11,16 @@ logger = {
     
     logImpressions: function(medium) {
         
-        medium.timestamp = new Date().getUTCSeconds();
+        medium.timestamp = Date.now() / 1000;
         logger.impressions.push(medium);
+            
+        try {
+            axios.post('http://localhost/player/impressions.php', { impressions: logger.impressions, });
         
-        if ( logger.impressions.length >= 3 ) {
-            
-            try {
-                axios.post('http://localhost/player/impressions.php', { impressions: logger.impressions, });
-            
-                logger.clearImpressions();
-            }
-            catch (e) {
-                logger.logError(e);
-            }
+            logger.__clearImpressions();
+        }
+        catch (e) {
+            logger.logError(e);
         }
     },
     
@@ -35,9 +31,9 @@ logger = {
      */
     logError: function(e, i = 0) {
         
-        if ( logger.errors.length > 100 ) return;  // Prevent memory overflow
+        if ( logger.errors.length > 200 ) return;  // Prevent memory leak
         
-        if (!(e instanceof Error)) e = new Error(e);  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch
+        if ( !(e instanceof Error) ) e = new Error(e);  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch
         
         logger.errors.push({
             "message": e.toString(),
@@ -45,10 +41,9 @@ logger = {
         });
         
         try {
-            console.log(logger.errors);
             axios.post('http://localhost/player/error.php', { errors: logger.errors });
             
-            logger.clearErrors();
+            logger.__clearErrors();
         }
         catch (catch_error) {
             // This set up delay to prevent too many server requests
@@ -65,8 +60,6 @@ logger = {
      */
     logOk: function() {
         
-        if ( logger.errors.length ) return;
-        
         try {
             const response = axios.get('http://localhost/player/ok.php');
         }
@@ -75,11 +68,12 @@ logger = {
         }
     },
     
-    clearErrors: function() {
+    
+    __clearErrors: function() {
         logger.errors = [];
     },
     
-    clearImpressions: function() {
+    __clearImpressions: function() {
         logger.impressions = [];
     }
 }

@@ -1,6 +1,5 @@
 /**
- * PLAYER OBJECT
- * @type {{playlist_index: number, init: player.init, loadPlaylist: (function(number=): [{duration: number, src: string, type: string},{duration: number, src: string, type: string},{duration: number, src: string, type: string},{duration: number, src: string, type: string},{duration: number, src: string, type: string},null,null,null]), logError: player.logError, playlist: *[], html_videos: NodeListOf<HTMLElementTagNameMap[string]>, next_medium: null, initNext: player.initNext, playNext: player.playNext}}
+ * PLAYER MODULE
  */
 player = {
     
@@ -21,6 +20,8 @@ player = {
     /////// METHODS ////////////////////////////////////////////////////
     
     init: async function() {
+        
+        console.log(new Date().getUTCSeconds());
         
         // EVENT LISTENERS FOR VIDEO ELEMENTS
         player.html_videos.forEach(video => {
