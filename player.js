@@ -1,5 +1,22 @@
 /**
  * PLAYER MODULE
+ *
+ * EVENT LISTENERS (video.ended) AND TIMEOUTS (images + iframes)
+ * ARE USED TO CALL playNext() METHOD WHICH CONTROLS THE FLOW
+ *
+ *
+ * THE FLOW LOOKS LIKE
+ * init() - first time script run
+ *   - loadPlaylist() - load playlist from server
+ *   - initNext() - set up next element to play
+ *   - playNext() - play next element
+ *
+ * LOOP
+ * playNext() - play next element
+ *   - run video image or iframe
+ *   - set up setTimeout() for images and iframes
+ *   - initNext() - set up next element to play
+ *
  */
 player = {
     
@@ -19,14 +36,15 @@ player = {
     
     /////// METHODS ////////////////////////////////////////////////////
     
+    /**
+     * INIT THE PLAYER WHEN SCRIPT RUNS FIRST TIME
+     */
     init: async function() {
-        
-        console.log(new Date().getUTCSeconds());
         
         // EVENT LISTENERS FOR VIDEO ELEMENTS
         player.html_videos.forEach(video => {
             video.addEventListener('ended', function (e) {
-                console.log('.................. ENDED');
+                console.log('.................. VIDEO ENDED');
                 logger.logImpressions(player.current_medium);
                 console.log(player.current_medium);
                 player.playNext();  // Can not use this cause it is anonymous function
@@ -50,8 +68,8 @@ player = {
     },
     
     /**
-     * SET UP FIRST ELEMENT TO PLAY
-     * AND PRELOADS THE RESOURCES
+     * SET UP ELEMENT TO PLAY
+     * AND PRELOADS NEXT RESOURCES
      */
     initNext: function() {
         try {
@@ -134,8 +152,6 @@ player = {
     
     /**
      * LOAD PLAYLIST FROM LOCAL SERVER
-     * @param i
-     * @returns {[{duration: number, src: string, type: string},{duration: number, src: string, type: string},{duration: number, src: string, type: string},{duration: number, src: string, type: string},{duration: number, src: string, type: string},null,null,null]}
      */
     loadPlaylist: async function() {
         try {

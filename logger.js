@@ -11,13 +11,13 @@ logger = {
     
     logImpressions: function(medium) {
         
-        medium.timestamp = Date.now() / 1000;
+        medium.timestamp = Math.round(Date.now() / 1000);  // now() returns milliseconds but we need seconds and integer
         logger.impressions.push(medium);
             
         try {
             axios.post('http://localhost/player/impressions.php', { impressions: logger.impressions, });
         
-            logger.__clearImpressions();
+            logger.__clearImpressionsxxx();
         }
         catch (e) {
             logger.logError(e);
@@ -61,7 +61,7 @@ logger = {
     logOk: function() {
         
         try {
-            const response = axios.get('http://localhost/player/ok.php');
+            axios.get('http://localhost/player/ok.php');
         }
         catch (e) {
             logger.logError(e);
