@@ -46,7 +46,6 @@ player = {
             video.addEventListener('ended', function (e) {
                 console.log('.................. VIDEO ENDED');
                 logger.logImpressions(player.current_medium);  // This is asynchronous call. It is not blocking the flow although inside the logImpressions() is await
-                console.log(player.current_medium);
                 player.playNext();  // Can not use this cause it is anonymous function
             });
             
@@ -109,6 +108,8 @@ player = {
             let next_element = document.querySelector('.next');
             let active_element = document.querySelector('.active');
             
+            console.log('Current medium:', player.current_medium);
+            
             if ( player.next_medium.type === 'video' ) {
                 next_element.play();
             }
@@ -160,7 +161,6 @@ player = {
             player.playlist = response.data;
         }
         catch( e ) {
-            console.error(e);
             logger.logError(e)
         }
     },

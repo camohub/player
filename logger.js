@@ -18,7 +18,6 @@ logger = {
             await axios.post('http://localhost/player/impressions.php', { impressions: logger.impressions, });
         
             logger.__clearImpressions();
-            console.log('impressions deleted');
         }
         catch (e) {
             logger.logError(e);
@@ -46,7 +45,6 @@ logger = {
             await axios.post('http://localhost/player/error.php', { errors: logger.errors });
             
             logger.__clearErrors();
-            console.log('errors deleted');
         }
         catch (catch_error) {
             // This set up delay to prevent too many server requests
@@ -74,10 +72,12 @@ logger = {
     
     __clearErrors: function() {
         logger.errors = [];
+        console.log('errors deleted');
     },
     
     __clearImpressions: function() {
         logger.impressions = [];
+        console.log('impressions deleted');
     }
 }
 
