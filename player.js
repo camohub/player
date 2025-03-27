@@ -30,10 +30,6 @@ player = {
     
     next_medium: null,
     
-    impressions: [],
-    
-    errors: [],
-    
     /////// METHODS ////////////////////////////////////////////////////
     
     /**
@@ -45,7 +41,7 @@ player = {
         player.html_videos.forEach(video => {
             video.addEventListener('ended', function (e) {
                 console.log('.................. VIDEO ENDED');
-                logger.logImpressions(player.current_medium);  // This is asynchronous call. It is not blocking the flow although inside the logImpressions() is await
+                logger.logImpression(player.current_medium);  // This is asynchronous call. It is not blocking the flow although inside the logImpressions() is await
                 player.playNext();  // Can not use this cause it is anonymous function
             });
             
@@ -117,7 +113,7 @@ player = {
                 
                 setTimeout(function () {
                     console.log('.................. IMAGE ENDED');
-                    logger.logImpressions(player.current_medium);
+                    logger.logImpression(player.current_medium);
                     player.playNext();  // Can not use this cause it is anonymous function
                 }, player.next_medium.duration * 1000 - 20);  // -20 is little reserve
             }
@@ -125,7 +121,7 @@ player = {
                 
                 setTimeout(function () {
                     console.log('.................. IFRAME ENDED');
-                    logger.logImpressions(player.current_medium);
+                    logger.logImpression(player.current_medium);
                     player.playNext();  // Can not use this cause it is anonymous function
                 }, player.next_medium.duration * 1000 - 20);  // -20 is little reserve
             }
