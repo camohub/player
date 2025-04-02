@@ -12,7 +12,29 @@
             box-sizing: border-box;
         }
         
-        #video-1 {
+        html, body {
+            height: 100%;
+            width: 100%;
+            position: relative;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .template {
+            position: relative;
+        }
+        
+        .wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .wrapper .video-1 {
             object-fit: fill;
             position: absolute;
             top: 0;
@@ -21,13 +43,9 @@
             height: 100% !important;
             max-width: 100% !important;
             max-height: 100% !important;
-            /*width: 33% !important;
-            height: 33% !important;
-            max-width: 33% !important;
-            max-height: 33% !important;*/
         }
-        
-        #video-2 {
+
+        .wrapper .video-2 {
             object-fit: fill;
             position: absolute;
             top: 0;
@@ -36,14 +54,9 @@
             height: 100% !important;
             max-width: 100% !important;
             max-height: 100% !important;
-            /*left: 33%;
-            width: 33% !important;
-            height: 33% !important;
-            max-width: 33% !important;
-            max-height: 33% !important;*/
         }
-        
-        #image-1 {
+
+        .wrapper .image-1 {
             position: absolute;
             top: 0;
             left: 0;
@@ -51,15 +64,9 @@
             height: 100% !important;
             max-width: 100% !important;
             max-height: 100% !important;
-            /*top: 33%;
-            left: 0;
-            width: 33% !important;
-            height: 33% !important;
-            max-width: 33% !important;
-            max-height: 33% !important;*/
         }
-        
-        #image-2 {
+
+        .wrapper .image-2 {
             position: absolute;
             top: 0;
             left: 0;
@@ -67,15 +74,9 @@
             height: 100% !important;
             max-width: 100% !important;
             max-height: 100% !important;
-            /*top: 33%;
-            left: 33%;
-            width: 33% !important;
-            height: 33% !important;
-            max-width: 33% !important;
-            max-height: 33% !important;*/
         }
-        
-        #iframe-1 {
+
+        .wrapper .iframe-1 {
             position: absolute;
             border: none;
             top: 0;
@@ -84,15 +85,9 @@
             height: 100% !important;
             max-width: 100% !important;
             max-height: 100% !important;
-            /*top: 66%;
-            left: 0;
-            width: 33% !important;
-            height: 33% !important;
-            max-width: 33% !important;
-            max-height: 33% !important;*/
         }
-        
-        #iframe-2 {
+
+        .wrapper .iframe-2 {
             position: absolute;
             border: none;
             top: 0;
@@ -101,15 +96,9 @@
             height: 100% !important;
             max-width: 100% !important;
             max-height: 100% !important;
-            /*top: 66%;
-            left: 33%;
-            width: 33% !important;
-            height: 33% !important;
-            max-width: 33% !important;
-            max-height: 33% !important;*/
         }
-        
-        .inactive {
+
+        .wrapper .inactive {
             display: none;
         }
         
@@ -129,24 +118,27 @@
 
 <body>
 
-<div id="wrapper">
+<!-- TEMPLATE IS USED BY Config TO CREATE PLAYER. IT TAKES WHOLE HTML AND CREATE NOW .wrapper NODE FOR EACH SCREEN. -->
+<div class="template">
     <!-- AUTOPLAY + MUTED IS IMPORTANT FOR AUTOPLAY. OTHERWISE BROWSER BLOCK AUTOPLAY -->
     <!-- PRELOAD NEEDS TO PRELOAD THE VIDEO -->
-    <video autoplay muted preload="auto" id="video-1" width="100%" height="100%" class="inactive"><div></div></video>
+    <video autoplay muted preload="auto" width="100%" height="100%" class="video-1 inactive"><div></div></video>
     
-    <video autoplay muted preload="auto" id="video-2" width="100%" height="100%" class="inactive"><div></div></video>
+    <video autoplay muted preload="auto" width="100%" height="100%" class="video-2 inactive"><div></div></video>
     
-    <img id="image-1" src="" width="100%" height="100%" class="inactive">
+    <img src="" width="100%" height="100%" class="image-1 inactive">
     
-    <img id="image-2" src="" width="100%" height="100%" class="inactive">
+    <img src="" width="100%" height="100%" class="image-2 inactive">
     
-    <iframe id="iframe-1" class="inactive"></iframe>
+    <iframe class="iframe-1 inactive"></iframe>
     
-    <iframe id="iframe-2" class="inactive"></iframe>
+    <iframe class="iframe-2 inactive"></iframe>
 </div>
 
-<script src="http://localhost/player/logger.js"></script>
-<script src="http://localhost/player/player.js"></script>
+<script src="http://localhost/player/js/logger.js"></script>
+<script src="http://localhost/player/js/player.js"></script>
+<script src="http://localhost/player/js/config.js"></script>
+<script src="http://localhost/player/js/bootstrap.js"></script>
 
 </body>
 </html>
