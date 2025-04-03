@@ -66,7 +66,7 @@ function Player(screen_config) {
         
         console.log('Player.initHtml()');
         console.log(self.html_wrapper);
-    };
+    }
     
     /**
      * INIT THE PLAYER WHEN SCRIPT RUNS FIRST TIME
@@ -115,7 +115,7 @@ function Player(screen_config) {
                 self.init();
             }, 15000);
         }
-    };
+    }
     
     /**
      * SET UP ELEMENT TO PLAY
@@ -124,7 +124,7 @@ function Player(screen_config) {
      */
     self.prepareNext = function(throw_error = false) {
         try {
-            self.next_medium = self.playlist[self.playlist_index];
+            self.next_medium = self.__getMediumByIndex(self.playlist_index);
             console.log('Next medium:', self.next_medium);
             
             if ( self.next_medium.type === 'video' ) {
@@ -149,7 +149,7 @@ function Player(screen_config) {
             logger.logError(e);
             if ( throw_error ) throw e;
         }
-    };
+    }
     
     /**
      * THIS METHOD PLAYS NEXT ELEMENT IN THE PLAYLIST
@@ -217,7 +217,7 @@ function Player(screen_config) {
             logger.logError(e);
             if ( throw_error ) throw e;
         }
-    };
+    }
     
     /**
      * LOAD PLAYLIST FROM LOCAL SERVER
@@ -227,10 +227,40 @@ function Player(screen_config) {
             const response = await axios.get('http://localhost/player/php/playlist.php');
             
             self.playlist = response.data;
+            
+            let now = self.__getCurrentTime();
+            
+            // FIND INDEX OF THE FIRST ELEMENT TO PLAY ACCORDING TO CURRENT TIME
+            let now_idx = self.playlist.content.playlist.time.findIndex((time, idx) => time < now);
+            
+            self.playlist_index = now_idx > 0 ? now_idx : 0;
         }
         catch( e ) {
             logger.logError(e);
             throw e;
         }
-    };
+    }
+    
+    self.__getMediumByIndex = function (idx) {
+        let playlist_item_id = self.playlist.content.playlist.item_id[idx];
+        let playlist_item = self.playlist.content.items.find((item) => item.item_id === playlist_item_id);
+        
+        let medium = {
+            type: playlist_item.contnet_type,
+            src: playlist_item.body.video ? playlist_item.body.video : playlist_item.body.image,
+            duration: playlist_item.duration,
+            screen_id: playlist_item.screen_id
+        }
+        
+        return medium;
+    }
+    
+    self.__getCurrentTime = function() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        
+        return `${hours}:${minutes}:${seconds}`;
+    }
 }
