@@ -16,13 +16,21 @@ function Bootstrap() {
      */
     self.init = async function(i = 0) {
         try {
+            // INIT LOGGER
             logger = new Logger();
-            config = new Config();
-            
             await logger.init();
+            
+            // INIT CONFIG
+            config = new Config();
             await config.init();
-            await self.setUpPlayers();
-            console.log('Bootstrap.init() +++++++++');
+            
+            // INIT PLAYERS
+            config.config.content.player.items.forEach(function (screen, idx) {
+                let player = new Player(screen);
+                player.initHtml();
+                player.init();
+                self.players.push(player);
+            });
         }
         catch (e) {  // THERE CAN BE CONNECTION ERROR SO NEED TO WAIT AND TRY AGAIN
             console.error(e);
@@ -37,18 +45,8 @@ function Bootstrap() {
         }
     }
     
-    /**
-     * SET UP PLAYERS ACCORDING SCREENS CONFIG
-     */
-    self.setUpPlayers = function() {
-        
-        config.config.content.player.items.forEach(function (screen, idx) {
-            let player = new Player(screen);
-            player.initHtml();
-            player.init();
-            self.players.push(player);
-        });
-    }
+    ///////// PRIVATE METHODS /////////////////////////////////////////////
+    
     
 }
 

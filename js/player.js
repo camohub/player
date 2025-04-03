@@ -2,20 +2,20 @@
  * PLAYER MODULE
  *
  * EVENT LISTENERS (video.ended) AND TIMEOUTS (images + iframes)
- * ARE USED TO CALL playNext() METHOD WHICH CONTROLS THE FLOW
+ * ARE USED TO CALL __playNext() METHOD WHICH CONTROLS THE FLOW
  *
  *
  * THE FLOW LOOKS LIKE
  * init() - first time script run
- *   - loadPlaylist() - load playlist from server
- *   - initNext() - set up next element to play
- *   - playNext() - play next element
+ *   - __loadPlaylist() - load playlist from server
+ *   - __prepareNext() - set up next element to play
+ *   - __playNext() - play next element
  *
  * LOOP
- * playNext() - play next element
+ * __playNext() - play next element
  *   - run video image or iframe
  *   - set up setTimeout() for images and iframes
- *   - initNext() - set up next element to play
+ *   - __prepareNext() - set up next element to play
  *
  */
 function Player(screen_config) {
@@ -74,14 +74,14 @@ function Player(screen_config) {
     self.init = async function(i = 0) {
         try {
             // LOAD PLAYLIST
-            await self.loadPlaylist();
+            await self.__loadPlaylist();
             
             // EVENT LISTENERS FOR VIDEO ELEMENTS
             self.html_videos.forEach(video => {
                 video.addEventListener('ended', function (e) {
                     console.log('.................. VIDEO ENDED');
                     logger.logImpression(self.current_medium);  // This is asynchronous call. It is not blocking the flow although inside the logImpressions() is await
-                    self.playNext();
+                    self.__playNext();
                     
                     console.log('+++++++++++++++++++++++++++++++++++');
                     console.log('+++++++++++++++++++++++++++++++++++');
@@ -92,16 +92,16 @@ function Player(screen_config) {
                 
                 video.addEventListener('error', function (e) {
                     console.log('|||||||||||||||||||| ERROR loading video');
-                    self.playNext();
+                    self.__playNext();
                     logger.logError(e);
                 });
             });
             
             // INIT FIRST MEDIUM
-            self.prepareNext(true);  // First run initialization
+            self.__prepareNext(true);  // First run initialization
             
             // FIRST RUN
-            self.playNext(true);  // First run
+            self.__playNext(true);  // First run
             
             console.log('Player.init() +++++++++');
         }
@@ -117,12 +117,14 @@ function Player(screen_config) {
         }
     }
     
+    ///////// PRIVATE METHODS /////////////////////////////////////////////
+    
     /**
      * SET UP ELEMENT TO PLAY
      * AND PRELOADS NEXT RESOURCES
      * SOMETIMES NEED TO THROWS ERROR E.G. IN INIT() METHOD
      */
-    self.prepareNext = function(throw_error = false) {
+    self.__prepareNext = function(throw_error = false) {
         try {
             self.next_medium = self.__getMediumByIndex(self.playlist_index);
             console.log('Next medium:', self.next_medium);
@@ -155,7 +157,7 @@ function Player(screen_config) {
      * THIS METHOD PLAYS NEXT ELEMENT IN THE PLAYLIST
      * HIDE PREVIOUS ELEMENT AND SHOW NEXT ELEMENT VIA CSS
      */
-    self.playNext = function(throw_error = false) {
+    self.__playNext = function(throw_error = false) {
         try {
             self.current_medium = self.next_medium;
             let next_element = self.html_wrapper.querySelector('.next');
@@ -178,7 +180,7 @@ function Player(screen_config) {
                     console.log('+++++++++++++++++++++++++++++++++++');
                     console.log('+++++++++++++++++++++++++++++++++++');
                     
-                    self.playNext();
+                    self.__playNext();
                 }, self.next_medium.duration * 1000 - 20);  // -20 is little reserve
             }
             else if ( self.next_medium.type === 'template' ) {
@@ -193,7 +195,7 @@ function Player(screen_config) {
                     console.log('+++++++++++++++++++++++++++++++++++');
                     console.log('+++++++++++++++++++++++++++++++++++');
                     
-                    self.playNext();
+                    self.__playNext();
                 }, self.next_medium.duration * 1000 - 20);  // -20 is little reserve
             }
             
@@ -211,7 +213,7 @@ function Player(screen_config) {
                 self.playlist_index = 0;
             }
             
-            self.prepareNext();
+            self.__prepareNext();
         }
         catch (e) {
             logger.logError(e);
@@ -222,7 +224,7 @@ function Player(screen_config) {
     /**
      * LOAD PLAYLIST FROM LOCAL SERVER
      */
-    self.loadPlaylist = async function() {
+    self.__loadPlaylist = async function() {
         try {
             const response = await axios.get('http://localhost/player/php/playlist.php');
             
@@ -246,7 +248,7 @@ function Player(screen_config) {
         let playlist_item = self.playlist.content.items.find((item) => item.item_id === playlist_item_id);
         
         let medium = {
-            type: playlist_item.contnet_type,
+            type: playlist_item.content_type,
             src: playlist_item.body.video ? playlist_item.body.video : playlist_item.body.image,
             duration: playlist_item.duration,
             screen_id: playlist_item.screen_id
