@@ -230,7 +230,7 @@ function Player(screen_config) {
             
             let now = self.__getCurrentTime();
             
-            // FIND INDEX OF THE FIRST ELEMENT TO PLAY ACCORDING TO CURRENT TIME
+            // FIND INDEX OF THE FIRST ELEMENT TO PLAY ACCORDING TO CURRENT TIME.
             let now_idx = self.playlist.content.playlist.time.findIndex((time, idx) => time < now);
             
             self.playlist_index = now_idx > 0 ? now_idx : 0;
