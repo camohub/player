@@ -12,5 +12,5 @@ $impressions = $post_data['impressions'] ?? [];
 // TODO: Store the impressions to the database and then to server may be MONGODB
 foreach ($impressions as $i) {
     
-    file_put_contents($impressions_log_path, date('Y-m-d H:i:s') . ' impressions.php' . serialize($i) . PHP_EOL, FILE_APPEND);
+    file_put_contents($impressions_log_path, date('Y-m-d H:i:s') . "\n" . json_encode($i) . PHP_EOL, FILE_APPEND);
 }

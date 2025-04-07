@@ -64,7 +64,7 @@ function Player(screen_config) {
         
         document.body.appendChild(self.html_wrapper);
         
-        console.log('Player.initHtml()');
+        console.log('+++++++++ Player.initHtml()');
         console.log(self.html_wrapper);
     }
     
@@ -82,16 +82,10 @@ function Player(screen_config) {
                     console.log('.................. VIDEO ENDED');
                     logger.logImpression(self.current_medium);  // This is asynchronous call. It is not blocking the flow although inside the logImpressions() is await
                     self.__playNext();
-                    
-                    console.log('+++++++++++++++++++++++++++++++++++');
-                    console.log('+++++++++++++++++++++++++++++++++++');
-                    console.log(self);
-                    console.log('+++++++++++++++++++++++++++++++++++');
-                    console.log('+++++++++++++++++++++++++++++++++++');
                 });
                 
                 video.addEventListener('error', function (e) {
-                    console.log('|||||||||||||||||||| ERROR loading video');
+                    console.log('XXXXXXXXXXXXXXXXXX ERROR loading video');
                     self.__playNext();
                     logger.logError(e);
                 });
@@ -103,7 +97,7 @@ function Player(screen_config) {
             // FIRST RUN
             self.__playNext(true);  // First run
             
-            console.log('Player.init() +++++++++');
+            console.log('+++++++++ Player.init()');
         }
         catch (e) {
             if ( ++i > 50 ) {  // TRY TO INIT 50 TIMES THEN LOG ERROR
@@ -173,13 +167,6 @@ function Player(screen_config) {
                 setTimeout(function () {
                     console.log('.................. IMAGE ENDED');
                     logger.logImpression(self.current_medium);
-                    
-                    console.log('+++++++++++++++++++++++++++++++++++');
-                    console.log('+++++++++++++++++++++++++++++++++++');
-                    console.log(self);
-                    console.log('+++++++++++++++++++++++++++++++++++');
-                    console.log('+++++++++++++++++++++++++++++++++++');
-                    
                     self.__playNext();
                 }, self.next_medium.duration * 1000 - 20);  // -20 is little reserve
             }
@@ -188,13 +175,6 @@ function Player(screen_config) {
                 setTimeout(function () {
                     console.log('.................. IFRAME ENDED');
                     logger.logImpression(self.current_medium);
-                    
-                    console.log('+++++++++++++++++++++++++++++++++++');
-                    console.log('+++++++++++++++++++++++++++++++++++');
-                    console.log(self);
-                    console.log('+++++++++++++++++++++++++++++++++++');
-                    console.log('+++++++++++++++++++++++++++++++++++');
-                    
                     self.__playNext();
                 }, self.next_medium.duration * 1000 - 20);  // -20 is little reserve
             }
@@ -226,14 +206,14 @@ function Player(screen_config) {
      */
     self.__loadPlaylist = async function() {
         try {
-            const response = await axios.get('http://localhost/player/php/playlist.php');
+            const response = await axios.get('http://localhost/player/php/playlist.php?screen_id=' + self.screen_config.id);
             
             self.playlist = response.data;
             
             let now = self.__getCurrentTime();
             
             // FIND INDEX OF THE FIRST ELEMENT TO PLAY ACCORDING TO CURRENT TIME.
-            let now_idx = self.playlist.content.playlist.time.findIndex((time, idx) => time < now);
+            let now_idx = self.playlist.content.playlist.time.findIndex((time, idx) => time > now);
             
             self.playlist_index = now_idx > 0 ? now_idx : 0;
         }
@@ -248,10 +228,10 @@ function Player(screen_config) {
         let playlist_item = self.playlist.content.items.find((item) => item.item_id === playlist_item_id);
         
         let medium = {
-            type: playlist_item.content_type,
-            src: playlist_item.body.video ? playlist_item.body.video : playlist_item.body.image,
+            type: playlist_item.type,
+            src: playlist_item.src,
             duration: playlist_item.duration,
-            screen_id: playlist_item.screen_id
+            screen_id: self.screen_config.id,
         }
         
         return medium;

@@ -20,7 +20,7 @@ function Config() {
             
             self.config = response.data;
             
-            console.log('Config.init() +++++++++');
+            console.log('+++++++++ Config.init()');
         }
         catch (e) {
             logger.logError(e);

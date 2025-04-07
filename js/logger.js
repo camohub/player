@@ -25,7 +25,7 @@ function Logger() {
             __sendImpressions();
         }, 10000);
         
-        console.log('Logger.init() +++++++++');
+        console.log('+++++++++ Logger.init()');
     }
     
     /**

@@ -50,4 +50,5 @@ function Bootstrap() {
     
 }
 
-bootstrap = (new Bootstrap()).init();
+bootstrap = new Bootstrap();
+bootstrap.init();
