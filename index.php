@@ -22,6 +22,7 @@
         
         .template {
             position: relative;
+            display: none;
         }
         
         .wrapper {
@@ -85,6 +86,7 @@
             height: 100% !important;
             max-width: 100% !important;
             max-height: 100% !important;
+            overflow: hidden;
         }
 
         .wrapper .iframe-2 {
@@ -96,6 +98,7 @@
             height: 100% !important;
             max-width: 100% !important;
             max-height: 100% !important;
+            overflow: hidden;
         }
 
         .wrapper .inactive {
@@ -112,8 +115,6 @@
         }
     </style>
     
-	<!--<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>-->
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -135,6 +136,8 @@
     <iframe class="iframe-2 inactive"></iframe>
 </div>
 
+<!--<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>-->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="http://localhost/player/js/logger.js"></script>
 <script src="http://localhost/player/js/player.js"></script>
 <script src="http://localhost/player/js/config.js"></script>

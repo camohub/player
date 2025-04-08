@@ -1,6 +1,10 @@
 DOKUMENTÁCIA K APLIKÁCII PLAYER
 ========================
 
+Console command to run Chromium
+- chrome.exe  --user-data-dir="C:\Users\Vlado" --app=http://localhost/player --start-fullscreen
+
+
 Aplikácia sa skladá zo súborov
 - index.php
 - bootstrap.js

@@ -50,7 +50,7 @@ function Player(screen_config) {
         
         // CSS CLASS
         self.html_wrapper.classList.add('wrapper');
-        self.html_wrapper.classList.add('wrapper');
+        self.html_wrapper.classList.remove('template');
         
         let prev_screen = config.config.content.player.items.find((screen) => screen.id == self.screen_config.id -1);
         let screens_count = config.config.content.player.items.length;
@@ -74,28 +74,28 @@ function Player(screen_config) {
     self.init = async function(i = 0) {
         try {
             // LOAD PLAYLIST
-            await self.__loadPlaylist();
+            await __loadPlaylist();
             
             // EVENT LISTENERS FOR VIDEO ELEMENTS
             self.html_videos.forEach(video => {
                 video.addEventListener('ended', function (e) {
                     console.log('.................. VIDEO ENDED');
                     logger.logImpression(self.current_medium);  // This is asynchronous call. It is not blocking the flow although inside the logImpressions() is await
-                    self.__playNext();
+                    __playNext();
                 });
                 
                 video.addEventListener('error', function (e) {
                     console.log('XXXXXXXXXXXXXXXXXX ERROR loading video');
-                    self.__playNext();
+                    __playNext();
                     logger.logError(e);
                 });
             });
             
             // INIT FIRST MEDIUM
-            self.__prepareNext(true);  // First run initialization
+            __prepareNext(true);  // First run initialization
             
             // FIRST RUN
-            self.__playNext(true);  // First run
+            __playNext(true);  // First run
             
             console.log('+++++++++ Player.init()');
         }
@@ -118,9 +118,9 @@ function Player(screen_config) {
      * AND PRELOADS NEXT RESOURCES
      * SOMETIMES NEED TO THROWS ERROR E.G. IN INIT() METHOD
      */
-    self.__prepareNext = function(throw_error = false) {
+    function __prepareNext(throw_error = false) {
         try {
-            self.next_medium = self.__getMediumByIndex(self.playlist_index);
+            self.next_medium = __getMediumByIndex(self.playlist_index);
             console.log('Next medium:', self.next_medium);
             
             if ( self.next_medium.type === 'video' ) {
@@ -135,7 +135,7 @@ function Player(screen_config) {
                 image.src = self.next_medium.src;
                 image.classList.add('next');
             }
-            else if ( self.next_medium.type === 'template' ) {
+            else if ( self.next_medium.type === 'www' ) {
                 let iframe = self.html_wrapper.querySelector('iframe.inactive');
                 iframe.src = self.next_medium.src;
                 iframe.classList.add('next');
@@ -151,7 +151,7 @@ function Player(screen_config) {
      * THIS METHOD PLAYS NEXT ELEMENT IN THE PLAYLIST
      * HIDE PREVIOUS ELEMENT AND SHOW NEXT ELEMENT VIA CSS
      */
-    self.__playNext = function(throw_error = false) {
+    function __playNext(throw_error = false) {
         try {
             self.current_medium = self.next_medium;
             let next_element = self.html_wrapper.querySelector('.next');
@@ -167,15 +167,15 @@ function Player(screen_config) {
                 setTimeout(function () {
                     console.log('.................. IMAGE ENDED');
                     logger.logImpression(self.current_medium);
-                    self.__playNext();
+                    __playNext();
                 }, self.next_medium.duration * 1000 - 20);  // -20 is little reserve
             }
-            else if ( self.next_medium.type === 'template' ) {
+            else if ( self.next_medium.type === 'www' ) {
                 
                 setTimeout(function () {
                     console.log('.................. IFRAME ENDED');
                     logger.logImpression(self.current_medium);
-                    self.__playNext();
+                    __playNext();
                 }, self.next_medium.duration * 1000 - 20);  // -20 is little reserve
             }
             
@@ -189,11 +189,11 @@ function Player(screen_config) {
             next_element.classList.add('active');  // Set next element as active
             
             ++self.playlist_index;
-            if ( self.playlist_index >= self.playlist.length ) {
+            if ( self.playlist_index >= self.playlist.id.length ) {
                 self.playlist_index = 0;
             }
             
-            self.__prepareNext();
+            __prepareNext();
         }
         catch (e) {
             logger.logError(e);
@@ -204,16 +204,18 @@ function Player(screen_config) {
     /**
      * LOAD PLAYLIST FROM LOCAL SERVER
      */
-    self.__loadPlaylist = async function() {
+    async function __loadPlaylist() {
         try {
             const response = await axios.get('http://localhost/player/php/playlist.php?screen_id=' + self.screen_config.id);
             
+            __validatePlaylist(response.data);
+            
             self.playlist = response.data;
             
-            let now = self.__getCurrentTime();
+            let now = __getCurrentTime();
             
             // FIND INDEX OF THE FIRST ELEMENT TO PLAY ACCORDING TO CURRENT TIME.
-            let now_idx = self.playlist.content.playlist.time.findIndex((time, idx) => time > now);
+            let now_idx = self.playlist.playlist.time.findIndex((time, idx) => time > now);
             
             self.playlist_index = now_idx > 0 ? now_idx : 0;
         }
@@ -223,9 +225,15 @@ function Player(screen_config) {
         }
     }
     
-    self.__getMediumByIndex = function (idx) {
-        let playlist_item_id = self.playlist.content.playlist.item_id[idx];
-        let playlist_item = self.playlist.content.items.find((item) => item.item_id === playlist_item_id);
+    /**
+     * GET MEDIUM BY INDEX
+     * @param idx
+     * @returns {{duration: *, src: *, screen_id, type}}
+     * @private
+     */
+    function __getMediumByIndex(idx) {
+        let playlist_item_id = self.playlist.playlist.id[idx][0];
+        let playlist_item = self.playlist.items.find((item) => item.id === playlist_item_id);
         
         let medium = {
             type: playlist_item.type,
@@ -237,12 +245,83 @@ function Player(screen_config) {
         return medium;
     }
     
-    self.__getCurrentTime = function() {
+    /**
+     * GET CURRENT TIME in HH:MM:SS format
+     * @returns {string}
+     * @private
+     */
+    function __getCurrentTime() {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
         const seconds = String(now.getSeconds()).padStart(2, '0');
         
         return `${hours}:${minutes}:${seconds}`;
+    }
+    
+    /**
+     * VALIDATE PLAYLIST
+     * @param playlist
+     * @private
+     */
+    function __validatePlaylist(playlist) {
+        
+        console.log(playlist);
+        
+        if ( !playlist ) {
+            logger.logError('Playlist is empty');
+            throw new Error('Playlist is empty');
+        }
+        else if ( typeof playlist.items === 'undefined' || playlist.items.length === 0 ) {
+            logger.logError('Playlist items array is missing');
+            throw new Error('Playlist items array is missing');
+        }
+        else if ( typeof playlist.playlist.id === 'undefined' || playlist.playlist.id.length === 0 ) {
+            logger.logError('Playlist id array is missing');
+            throw new Error('Playlist id array is missing');
+        }
+        else if ( typeof playlist.playlist.time === 'undefined' || playlist.playlist.time.length === 0 ) {
+            logger.logError('Playlist time array is missing');
+            throw new Error('Playlist time array is missing');
+        }
+        
+        playlist.items.forEach((item) => {
+            if ( typeof item.id === 'undefined' ) {  // item.id is required
+                logger.logError('Playlist item.id is missing');
+                throw new Error('Playlist item.id is missing');
+            }
+            else if ( !playlist.playlist.id.find((i) => i[0] == item.id ) ) {  // item.id has to be included in playlist.playlist.id array
+                logger.logError('Playlist item.id is is not included in playlist.playlist.id array');
+                throw new Error('Playlist item.id is is not included in playlist.playlist.id array');
+            }
+            else if ( typeof item.id_campaign === 'undefined' ) {  // item.campaign_id is required
+                logger.logError('Playlist item.id_campaign is missing');
+                throw new Error('Playlist item.id_campaign is missing');
+            }
+            else if ( typeof item.id_media === 'undefined' ) {  // item.id_media is required
+                logger.logError('Playlist item.id_media is missing');
+                throw new Error('Playlist item.id_media is missing');
+            }
+            else if ( typeof item.type === 'undefined' ) {  // item.type is required
+                logger.logError('Playlist item.type is missing');
+                throw new Error('Playlist item type is missing');
+            }
+            else if ( ['video', 'image', 'www'].indexOf(item.type) === -1 ) {  // item.type has to be one of the allowed types
+                logger.logError('Playlist item.type is out of allowed range');
+                throw new Error('Playlist item type is out of allowed range');
+            }
+            else if ( typeof item.src === 'undefined' ) {  // item.src is required
+                logger.logError('Playlist item.src is missing');
+                throw new Error('Playlist item src is missing');
+            }
+            else if ( typeof item.duration === 'undefined' ) {  // item.duration is required
+                logger.logError('Playlist item.duration is missing');
+                throw new Error('Item duration is missing');
+            }
+            else if ( !item.duration ) {  // item.duration has to be greater than 0
+                logger.logError('Playlist item.duration is empty');
+                throw new Error('Playlist item.duration is empty');
+            }
+        });
     }
 }
