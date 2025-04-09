@@ -5,9 +5,11 @@ function Logger() {
     
     const self = this;
     
-    self.impressions = [];
+    self.impressions = [];  // Impressions queue
     
-    self.errors = [];
+    self.errors = [];  // Errors queue
+    
+    self.errors_leaks_check = {};  // This object count number of the same errors messages
     
     self.connection_error = false;
     
@@ -23,7 +25,11 @@ function Logger() {
             __sendOk();
             __sendErrors();
             __sendImpressions();
-        }, 10000);
+        }, 15000);
+        
+        setInterval(function() {
+            self.errors_leaks_check = {};  // Reset self.errors_leaks_check every hour
+        }, 1000 * 60 * 60);
         
         console.log('+++++++++ Logger.init()');
     }
@@ -39,19 +45,23 @@ function Logger() {
     
     /**
      * ADD ERROR TO ARRAY
+     * METHOD IMPLEMENTS MEMORY LEAKS CONTROL
      * @param e
      */
     self.logError = async function(e) {
         
-        if ( self.errors.length > 500 ) return;  // Prevent memory leak
-        
         if ( !(e instanceof Error) ) e = new Error(e);  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch
         
-        self.errors.push({
+        let error = {
             "message": e.toString(),
             'stack': (e.stack ? e.stack : null),
             'timestamp': Math.round(Date.now() / 1000),  // now() returns milliseconds but we need seconds and integer
-        });
+        };
+        
+        if ( __canAddError(error) ) {  // Prevent memory leak
+            self.errors.push(error);
+        };
+        
     }
     
     ////// PRIVATE ///////////////////////////////////////////////////////////////////////
@@ -160,4 +170,27 @@ function Logger() {
     function __hasConnectionError(){
         return self.connection_error;
     }
+    
+    /**
+     * ADD ERROR ONLY IF THERE IS LESS THAN X ERRORS WITH THE SAME MESSAGE IN self.errors_leaks_check
+     * @returns {boolean}
+     * @private
+     */
+    function __canAddError(e) {
+        
+        let has_error = self.errors_leaks_check[e.message] ? self.errors_leaks_check[e.message] : null;
+        
+        if ( has_error && has_error > 300 ) {
+            return false;
+        }
+        
+        self.errors_leaks_check[e.message] = self.errors_leaks_check[e.message]
+            ? ++self.errors_leaks_check[e.message]
+            : 1
+        
+        console.log('Error count:', self.errors_leaks_check[e.message]);
+        
+        return true;
+    }
+
 }

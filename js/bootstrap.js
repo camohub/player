@@ -14,7 +14,7 @@ function Bootstrap() {
      * @param i
      * @returns {Promise<void>}
      */
-    self.init = async function(i = 0) {
+    self.init = async function() {
         try {
             // INIT LOGGER
             logger = new Logger();
@@ -33,11 +33,7 @@ function Bootstrap() {
             });
         }
         catch (e) {  // THERE CAN BE CONNECTION ERROR SO NEED TO WAIT AND TRY AGAIN
-            console.error(e);
-            if ( ++i > 50 ) {
-                logger.logError(e);
-                i = 0;
-            }
+            logger.logError(e);
             
             setTimeout(function (i) {
                 self.init();
