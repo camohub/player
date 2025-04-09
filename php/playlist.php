@@ -1,7 +1,7 @@
 <?php
 
 // TODO: Need to check screen_id in url query string and return related playlist for the screen_id!!!!
-require_once 'playists_mock.php';
+require_once 'playlists_mock.php';
 
 // Nastavíme správny Content-Type pre JSON
 header('Content-Type: application/json');
