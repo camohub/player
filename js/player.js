@@ -232,8 +232,8 @@ function Player(screen_config) {
      */
     function __getMediumByIndex(idx) {
         try {
-            let playlist_item_id = self.playlist.playlist.id[idx][0];
-            let playlist_item = self.playlist.items.find((item) => item.id === playlist_item_id);
+            let playlist_item_id = self.playlist.playlist.id[idx][0];  // Find item id according current index in playlist.playlist.id array
+            let playlist_item = self.playlist.items.find((item) => item.id === playlist_item_id);  // Find item id in playlist.items array
             
             let medium = {
                 campaign_id: playlist_item.id_campaign,
@@ -247,7 +247,7 @@ function Player(screen_config) {
             return medium;
         }
         catch (e) {
-            throw new Error('Medium not found in playlist');
+            throw new Error('Medium item id not found in playlist items array');
         }
     }
     
@@ -289,9 +289,10 @@ function Player(screen_config) {
             if ( typeof item.id === 'undefined' ) {  // item.id is required
                 throw new Error('Playlist validation error - Playlist item.id is missing');
             }
-            else if ( !playlist.playlist.id.find((i) => i[0] == item.id ) ) {  // item.id has to be included in playlist.playlist.id array
+            // TODO: Player can run also with this error. This blocks the player.
+            /*else if ( !playlist.playlist.id.find((i) => i[0] == item.id ) ) {  // item.id has to be included in playlist.playlist.id array
                 throw new Error('Playlist validation error - Playlist item.id is is not included in playlist.playlist.id array');
-            }
+            }*/
             else if ( typeof item.id_campaign === 'undefined' ) {  // item.campaign_id is required
                 throw new Error('Playlist validation error - Playlist item.id_campaign is missing');
             }

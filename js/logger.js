@@ -25,7 +25,7 @@ function Logger() {
             __sendOk();
             __sendErrors();
             __sendImpressions();
-        }, 15000);
+        }, 17000);  // 17 is chosen to eliminate self.logXXX and __sendXXX actions collisions. self.logXXX has mostly 10 seconds period.
         
         setInterval(function() {
             self.errors_leaks_check = {};  // Reset self.errors_leaks_check every hour
@@ -35,7 +35,7 @@ function Logger() {
     }
     
     /**
-     * ADD IMPRESION TO ARRAY
+     * ADD IMPRESSION TO ARRAY
      * @param medium
      */
     self.logImpression = async function(medium) {

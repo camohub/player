@@ -15,7 +15,7 @@ $screen_0 = [
             "id_application" => -1
         ],
         [
-            "id" => 24,
+            "id" => 24999,  // TODO: Thisis test for error handling in the player with invalid item id. return back to 24.
             "src" => "http://localhost/player/html-test-2.php",
             "type" => "www",
             "duration" => 10,
