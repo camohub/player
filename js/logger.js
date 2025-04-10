@@ -180,15 +180,14 @@ function Logger() {
         
         let has_error = self.errors_leaks_check[e.message] ? self.errors_leaks_check[e.message] : null;
         
-        if ( has_error && has_error > 300 ) {
+        if ( has_error && has_error > 100 ) {
             return false;
         }
         
+        // IF HAS NOT ERROR YET SET UP 1 OTHERWISE INCREMENT +1
         self.errors_leaks_check[e.message] = self.errors_leaks_check[e.message]
             ? ++self.errors_leaks_check[e.message]
             : 1
-        
-        console.log('Error count:', self.errors_leaks_check[e.message]);
         
         return true;
     }
